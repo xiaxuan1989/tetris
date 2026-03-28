@@ -357,7 +357,7 @@ private:
     void drawBlockAtScreen(const Point& screen, int colorCode) const {
         terminal_.moveCursor(screen.x, screen.y);
         terminal_.setColor(colorCode);
-        std::printf(colorCode == kBackColor ? "  " : "██");
+        std::printf(colorCode == kBackColor ? "  " : "██");  // 棋盘中方块
     }
 
     void drawPiece(const Piece& piece, int colorCode) const {
@@ -475,7 +475,7 @@ private:
         terminal_.setColor(definition.colorCode);
         for (const auto& block : previewState.blocks) {
             terminal_.moveCursor(previewX + block.x * 2, previewY + block.y);
-            std::printf("██");
+            std::printf("██");  // 预览
         }
         std::fflush(stdout);
     }
@@ -690,20 +690,21 @@ private:
     void handleGameOver() {
         terminal_.setColor(46);
         terminal_.moveCursor(kScoreX, 12);
-        std::printf("0    ");
+        std::printf("0    "); // 归零
 
         terminal_.moveCursor(kMedalX - 1, 16);
         for (int count = 0; count < medalRank_; ++count) {
-            std::printf("  ");
+            std::printf("  "); // 清除
         }
 
-        terminal_.setColor(kBackColor);
+        terminal_.setColor(39);
         for (int y = kBoardHeight - 1; y >= 0; --y) {
             for (int x = 0; x < kBoardWidth; ++x) {
                 terminal_.moveCursor(kBoardLeft + x * 2, kBoardTop + y);
-                std::printf("██");
+                std::printf("██"); // Game Over 覆盖动画
             }
-            terminal_.sleepMs(1);
+            std::fflush(stdout);
+            terminal_.sleepMs(12);
         }
 
         resetRoundState();
