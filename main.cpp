@@ -178,14 +178,20 @@ public:
 
 private:
     static constexpr int kBackColor = 0;
-    static constexpr int kBoardWidth = 15;
-    static constexpr int kBoardHeight = 25;
-    static constexpr int kBoardLeft = 4;
+    static constexpr int kBoardWidth = 10;
+    static constexpr int kBoardHeight = 20;
+    static constexpr int kBoardLeft = 3;
     static constexpr int kBoardTop = 3;
-    static constexpr int kSpawnX = 7;
+    static constexpr int kSpawnX = kBoardWidth / 2 - 1;
     static constexpr int kSpawnY = 0;
     static constexpr std::array<int, 6> kSpeed = {0, 12, 9, 6, 3, 1};
     static constexpr std::array<int, 5> kLineScores = {0, 1, 3, 6, 10};
+    static constexpr int kSidePanelLeft = 2 * kBoardWidth + 6;  // 旁栏左测坐标
+    static constexpr int kSidePanelWidth = 9;
+    static constexpr int kNextX = kSidePanelLeft + 8;
+    static constexpr int kBestX = kSidePanelLeft + 10;
+    static constexpr int kScoreX = kSidePanelLeft + 10;
+    static constexpr int kMedalX = kSidePanelLeft + 6;
 
     struct Point {
         int x;
@@ -372,51 +378,46 @@ private:
         terminal_.moveCursor(1, 1);
         terminal_.setColor(kBackColor);
 
-        for (int column = 0; column < kBoardWidth; ++column) {
+        for (int column = 0; column < kBoardWidth + kSidePanelWidth + 2; ++column)
             std::printf("[]");
-        }
-        std::printf("[][][][][][][][][][][]\n");
 
         for (int row = 0; row < kBoardHeight + 1; ++row) {
             terminal_.moveCursor(1, 2 + row);
             std::printf("[]");
-            terminal_.moveCursor(kBoardWidth * 2 + 7, 2 + row);
-            if (row == 8 || row == 16) {
-                std::printf("[][][][][][][][][][]");
-            } else {
-                std::printf("[]");
-            }
-            terminal_.moveCursor(kBoardWidth * 2 + 25, 2 + row);
+            terminal_.moveCursor(kBoardWidth * 2 + 3, 2 + row);
+            if (row == 7 || row == 13) {
+                for(int column = 0; column < kSidePanelWidth; ++column)
+                    std::printf("[]");
+            } else { std::printf("[]"); }
+            terminal_.moveCursor(kBoardWidth * 2 + 3 + kSidePanelWidth * 2, 2 + row);
             std::printf("[]");
         }
 
         terminal_.moveCursor(1, 3 + kBoardHeight);
-        for (int column = 0; column < kBoardWidth; ++column) {
+        for (int column = 0; column < kBoardWidth + kSidePanelWidth + 2; ++column)
             std::printf("[]");
-        }
-        std::printf("[][][][][][][][][][][]\n");
 
         terminal_.setColor(43);
-        terminal_.moveCursor(22 + kBoardWidth, 12);
+        terminal_.moveCursor(kSidePanelLeft, 11);
         std::printf("BEST      %d", bestScore_);
         terminal_.setColor(46);
-        terminal_.moveCursor(22 + kBoardWidth, 14);
+        terminal_.moveCursor(kSidePanelLeft, 12);
         std::printf("SCORE");
         terminal_.setColor(44);
-        terminal_.moveCursor(22 + kBoardWidth, 16);
+        terminal_.moveCursor(kSidePanelLeft, 13);
         std::printf("MEDAL");
         terminal_.setColor(39);
-        terminal_.moveCursor(22 + kBoardWidth, 20);
+        terminal_.moveCursor(kSidePanelLeft, 17);
         std::printf("↑ ↓ ←  →");
-        terminal_.moveCursor(22 + kBoardWidth, 21);
+        terminal_.moveCursor(kSidePanelLeft, 18);
         std::printf("W S A  D");
-        terminal_.moveCursor(22 + kBoardWidth, 22);
+        terminal_.moveCursor(kSidePanelLeft, 19);
         std::printf("[SPACE] pause");
-        terminal_.moveCursor(22 + kBoardWidth, 23);
+        terminal_.moveCursor(kSidePanelLeft, 20);
         std::printf("[X] hard drop");
-        terminal_.moveCursor(22 + kBoardWidth, 24);
+        terminal_.moveCursor(kSidePanelLeft, 21);
         std::printf("[Q/ESC] exit");
-        terminal_.moveCursor(22 + kBoardWidth, 3);
+        terminal_.moveCursor(kSidePanelLeft, 3);
         std::printf("NEXT");
 
         terminal_.setColor(kBackColor);
@@ -435,14 +436,14 @@ private:
 
     void updateHud() {
         terminal_.setColor(46);
-        terminal_.moveCursor(47, 14);
+        terminal_.moveCursor(kScoreX, 12);
         std::printf("%-5d", score_);
 
         terminal_.setColor(44);
-        terminal_.moveCursor(43, 16);
-        std::printf("      ");
+        terminal_.moveCursor(kMedalX, 13);
+        std::printf("      "); // 清除
         if (score_ > 0) {
-            terminal_.moveCursor(43, 16);
+            terminal_.moveCursor(kMedalX, 16);
             for (int count = 0; count < medalRank_; ++count) {
                 std::printf("★");
             }
@@ -454,7 +455,7 @@ private:
         }
 
         terminal_.setColor(43);
-        terminal_.moveCursor(47, 12);
+        terminal_.moveCursor(kBestX, 11);
         std::printf("%-5d", bestScore_);
         std::fflush(stdout);
     }
@@ -462,13 +463,13 @@ private:
     void drawNextPiece(int type) const {
         const auto& definition = tetromino(type);
         const auto& previewState = kRotationStates[definition.baseRotationIndex];
-        const int previewX = 43 + definition.previewOffsetX;
+        const int previewX = kNextX + definition.previewOffsetX;
         const int previewY = 6;
 
         terminal_.setColor(kBackColor);
         for (int row = 0; row < 4; ++row) {
-            terminal_.moveCursor(40, previewY + row - 2);
-            std::printf("          ");
+            terminal_.moveCursor(kSidePanelLeft + 3, previewY + row - 2);
+            std::printf("          "); // 清除上一个预览
         }
 
         terminal_.setColor(definition.colorCode);
@@ -688,10 +689,10 @@ private:
 
     void handleGameOver() {
         terminal_.setColor(46);
-        terminal_.moveCursor(47, 14);
+        terminal_.moveCursor(kScoreX, 12);
         std::printf("0    ");
 
-        terminal_.moveCursor(42, 16);
+        terminal_.moveCursor(kMedalX - 1, 16);
         for (int count = 0; count < medalRank_; ++count) {
             std::printf("  ");
         }
