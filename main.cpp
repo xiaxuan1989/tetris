@@ -697,13 +697,14 @@ private:
             std::printf("  "); // 清除
         }
 
-        terminal_.setColor(kBackColor);
+        terminal_.setColor(39);
         for (int y = kBoardHeight - 1; y >= 0; --y) {
             for (int x = 0; x < kBoardWidth; ++x) {
                 terminal_.moveCursor(kBoardLeft + x * 2, kBoardTop + y);
-                std::printf("██"); // 清除
+                std::printf("██"); // Game Over 覆盖动画
             }
-            terminal_.sleepMs(1);
+            std::fflush(stdout);
+            terminal_.sleepMs(12);
         }
 
         resetRoundState();
