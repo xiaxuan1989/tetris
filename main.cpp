@@ -443,7 +443,7 @@ private:
         terminal_.moveCursor(kMedalX, 13);
         std::printf("      "); // 清除
         if (score_ > 0) {
-            terminal_.moveCursor(kMedalX, 16);
+            terminal_.moveCursor(kMedalX, 13);
             for (int count = 0; count < medalRank_; ++count) {
                 std::printf("★");
             }
@@ -692,7 +692,7 @@ private:
         terminal_.moveCursor(kScoreX, 12);
         std::printf("0    "); // 归零
 
-        terminal_.moveCursor(kMedalX - 1, 16);
+        terminal_.moveCursor(kMedalX - 1, 13);
         for (int count = 0; count < medalRank_; ++count) {
             std::printf("  "); // 清除
         }
